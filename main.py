@@ -17,10 +17,18 @@ def Lexer(data):
 
     lexed = []
     temp = ""
+    skipnext = False
     for i,char in enumerate(string):
+        if skipnext:
+            skipnext = False
+            continue
         if char != " ":
             temp += char
         if (i+1 < len(string)):
+            if temp == "/" and string[i+1] == "/":
+                lexed.append("<comment>")
+                temp = ""
+                skipnext = True
             if string[i+1] == " " or string[i+1] in symbols or temp in symbols:
                 if temp == "\n":
                     temp = "<newline>"
