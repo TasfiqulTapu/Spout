@@ -2,7 +2,9 @@ from enum import Enum, auto
 
 class TokenType(Enum):
     Number = auto()
+    Char = auto()
     Identifier = auto()
+    StringLiteral = auto()
     Let = auto()
     Const = auto()
     Whale = auto()
@@ -31,10 +33,14 @@ def Lexer(data):
     lexed = []
     temp = ""
     skipline = False
-    for i,char in enumerate(string):
+    
+    i = 0
+    while (i < len(string)):
+        char = string[i]
         if skipline and char == "\n":
             skipline = False
         if skipline:
+            i+=1
             continue
         if char != " " and char != "\t":
             temp += char
@@ -43,12 +49,41 @@ def Lexer(data):
                 lexed.append("<comment>")
                 temp = ""
                 skipline = True
+            # handle strings
+            if char == "\"":
+                while(string[i+1] != "\""):
+                    i+=1
+                    temp += string[i]
+                    if i >= len(string):
+                        raise f"Unmatched double quotes (\") at {i}"
+                temp+="\""
+                i+=1
+                lexed.append(temp)
+                temp=""
+                if i+1 == len(string):
+                    continue
+            if char == "'":
+                while(string[i+1] != "'"):
+                    i+=1
+                    temp += string[i]
+                    if i >= len(string):
+                        raise f"Unmatched single quotes (\') at {i}"
+                temp+="'"
+                i+=1
+                lexed.append(temp)
+                temp=""
+                if i+1 == len(string):
+                    continue
+            
+            
+            
             if string[i+1] == " " or string[i+1] == "\t" or string[i+1] in symbols or temp in symbols:
                 if temp == "\n":
                     temp = "<newline>"
                 if temp != "":
                     lexed.append(temp)  
                 temp = ""
+        i+=1
     print(lexed)
     tokens = tokenize(lexed)
     return tokens
@@ -87,6 +122,8 @@ def tokenize(lex):
             tokens.append(token(lex.pop(0),TokenType.BinaryOperator))
         elif lex[0] == "=":
             tokens.append(token(lex.pop(0),TokenType.Equals))
+        elif lex[0] == "<comment>":
+            lex.pop(0)
         else:
             if parseInt(lex[0]):
                 tokens.append(token(lex.pop(0), TokenType.Number))
@@ -95,6 +132,10 @@ def tokenize(lex):
                 reserved = lex[0] in KEYWORDS
                 if reserved:
                     tokens.append(token(lex[0], KEYWORDS[lex.pop(0)]))
+                elif lex[0][0] == "\"":
+                    tokens.append(token(lex.pop(0), TokenType.StringLiteral))
+                elif lex[0][0] == "'":
+                    tokens.append(token(lex.pop(0), TokenType.Char))
                 else:
                     tokens.append(token(lex.pop(0), TokenType.Identifier))
             
