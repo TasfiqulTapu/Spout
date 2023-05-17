@@ -4,7 +4,7 @@ class TokenType(Enum):
     Number = auto()
     Char = auto()
     Identifier = auto()
-    StringLiteral = auto()
+    String = auto()
     Let = auto()
     Const = auto()
     Whale = auto()
@@ -12,7 +12,8 @@ class TokenType(Enum):
     UnaryOperator = auto()
     Equals = auto()
     OpenParen = auto()
-    ClosePare = auto()
+    CloseParen = auto()
+    Newline = auto()
     EOF = auto()
 
 KEYWORDS = {
@@ -28,6 +29,7 @@ def Lexer(data):
     lexical = []
     #automatic newline insertion
     string = data.replace(";", "\n")
+    string = string  + "\n"
     symbols = ["=", "+", "-", "*", "/", "%", "(", ")", "'", "&", "|", "^", "~", "!", "<", ">", "\n",","]
 
     lexed = []
@@ -84,7 +86,11 @@ def Lexer(data):
                     lexed.append(temp)  
                 temp = ""
         i+=1
-    print(lexed)
+        
+        # if temp != "":
+        #     if temp == "\n": lexed.append("<newline>")
+        #     else: lexed.append(temp)
+    # print(lexed)
     tokens = tokenize(lexed)
     return tokens
 
@@ -103,7 +109,7 @@ def parseInt(value):
         last = value
     
     if last.isnumeric():
-        return {value: int(last, base), base: base}
+        return {"value": int(last, base), "base": base}
     return False
     
 
@@ -117,13 +123,15 @@ def tokenize(lex):
         if lex[0] == "(":
             tokens.append(token(lex.pop(0),TokenType.OpenParen))
         elif lex[0] == ")":
-            tokens.append(token(lex.pop(0),TokenType.ClosePare))
+            tokens.append(token(lex.pop(0),TokenType.CloseParen))
         elif lex[0] in BinOps:
             tokens.append(token(lex.pop(0),TokenType.BinaryOperator))
         elif lex[0] == "=":
             tokens.append(token(lex.pop(0),TokenType.Equals))
         elif lex[0] == "<comment>":
             lex.pop(0)
+        elif lex[0] == "<newline>":
+            tokens.append(token(lex.pop(0),TokenType.Newline))
         else:
             if parseInt(lex[0]):
                 tokens.append(token(lex.pop(0), TokenType.Number))
@@ -133,7 +141,7 @@ def tokenize(lex):
                 if reserved:
                     tokens.append(token(lex[0], KEYWORDS[lex.pop(0)]))
                 elif lex[0][0] == "\"":
-                    tokens.append(token(lex.pop(0), TokenType.StringLiteral))
+                    tokens.append(token(lex.pop(0)[1:-1], TokenType.String))
                 elif lex[0][0] == "'":
                     tokens.append(token(lex.pop(0), TokenType.Char))
                 else:
