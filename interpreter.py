@@ -1,41 +1,45 @@
 from parser import Parser
-
-nonetype = {"type": "None", "value": "None"}
+from environment import defineUndefined
 
 class Interpreter:
-    def __init__(self):
-        pass
+    def __init__(self, env):
+        self.env = env
     def eval_program(self, ast):
-        latest = nonetype
+        latest = defineUndefined()
         for stmt in ast["body"]:
-            latest = self.eval_stmt(stmt)
+            latest = self.eval_stmt(stmt, self.env)
         return latest["value"]
     
-    def eval_stmt(self, stmt):
-        if stmt["type"] == "NumberLiteral":
+    def eval_stmt(self, stmt, env):
+        if stmt["type"] == "NumericLiteral":
             return { "type": "number", "value": stmt["value"], "dtype": stmt["dtype"]}
         elif stmt["type"] == "StringLiteral":
             return { "type": "string", "value": stmt["value"]}
+        elif stmt["type"] == "Identifier":
+            value = self.eval_identifier(stmt, env)
         elif stmt["type"] == "BinaryExpression":
-            value = self.eval_binary_expr(stmt)
+            value = self.eval_binary_expr(stmt,env)
         elif stmt["type"] == "Program":
-            value = self.eval_program(stmt)
+            value = self.eval_program(stmt,env)
         else:
-            raise Exception(f"Unknown statement type: {stmt['type']}")
+            raise Exception(f"Unknown statement type: {stmt['type']}\n{stmt}")
         return value
     
-    def eval_binary_expr(self, expr):
-        left = self.eval_stmt(expr["left"])
-        right = self.eval_stmt(expr["right"])
+    def eval_identifier(self, stmt, env):
+        return env.retrive(stmt["value"])
+
+    def eval_binary_expr(self, expr, env):
+        left = self.eval_stmt(expr["left"],env)
+        right = self.eval_stmt(expr["right"],env)
         # check if both are numbers
         if left["type"] == "number" and right["type"] == "number":
             return self.eval_binary_expr_int(expr["operator"], left, right)
         elif left["type"] == "string" or right["type"] == "string":
             return self.eval_binary_expr_str(expr["operator"], left, right)
-        return nonetype
+        return defineUndefined()
     
     def eval_binary_expr_int(self, op, left_v, right_v):
-        value = nonetype
+        value = defineUndefined()
         left = left_v["value"]
         right = right_v["value"]
         dtype = left_v["dtype"]

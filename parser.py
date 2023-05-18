@@ -1,4 +1,5 @@
 from lexer import TokenType, Lexer, parseInt
+from environment import defineUndefined
 
 class Parser:
     # have a private token list
@@ -19,7 +20,7 @@ class Parser:
         if self.peek()["type"] == type:
             return self.consume()
         else:
-            raise Exception("Expected " + type + " but got " + self.peek()["type"])
+            raise Exception("Expected " + type + " but got " + self.peek()["type"][0])
 
     def createAST(self, sourceCode):
         self.tokens = Lexer(sourceCode)
@@ -33,6 +34,38 @@ class Parser:
         return ast
 
     def parse_stmt(self):
+        ttype = self.peek()["type"]
+        if ttype == TokenType.Let or ttype == TokenType.Const:
+            return self.parse_var_declaration()
+        elif ttype == TokenType.Whale:
+            return self.parse_whale()
+        return self.parse_expr()
+
+    def parse_var_declaration(self):
+        isConst = self.consume()["type"] == TokenType.Const
+        name = self.expect(TokenType.Identifier)["value"]
+        if self.peek()["type"] == TokenType.Newline:
+            self.consume()
+            if isConst:
+                raise Exception("Constant values must have value at declaration")
+            return {
+                "type" : "VariableDeclaration",
+                "name" : name,
+                "const": False,
+                "value": defineUndefined()
+            }
+        self.expect(TokenType.Equals)
+        value = self.parse_expr()
+        dec =  {
+            "type": "VariableDeclaration",
+            "name": name,
+            "value": value,
+            "const": isConst
+        }
+        self.expect(TokenType.Newline)
+        return dec
+
+    def parse_whale(self):
         return self.parse_expr()
 
     def parse_expr(self):
@@ -69,7 +102,7 @@ class Parser:
         if curr == TokenType.Number:
             num = parseInt(self.consume()["value"])
             return {
-                "type": "NumberLiteral",
+                "type": "NumericLiteral",
                 "value": num["value"],
                 "base": num["base"],
                 "dtype": "int"
@@ -80,11 +113,19 @@ class Parser:
                 "value": self.consume()["value"],
                 "dtype": "string"
             }
+        elif curr == TokenType.Identifier:
+            return {
+                "type": "Identifier",
+                "value": self.consume()["value"]
+            }
         elif curr == TokenType.OpenParen:
             self.consume()
             expr = self.parse_expr()
             self.expect(TokenType.CloseParen)
             return expr
+        elif curr == TokenType.Newline:
+            self.consume()
+            return self.parse_stmt()
         else:
             raise Exception("Unexpected token " + self.peek()["value"])
         
