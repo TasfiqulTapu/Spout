@@ -1,3 +1,4 @@
-let a = 5 + 4;
-const b = "true"
-let c;
+let a = 0b11000111
+let b = 0b01001011
+
+let xor = a ^ b

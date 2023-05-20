@@ -29,7 +29,7 @@ def Lexer(data):
     lexical = []
     #automatic newline insertion
     string = data.replace(";", "\n")
-    string = string  + "\n"
+    string = string  + "\n\n"
     symbols = ["=", "+", "-", "*", "/", "%", "(", ")", "'", "&", "|", "^", "~", "!", "<", ">", "\n",","]
 
     lexed = []
@@ -77,6 +77,16 @@ def Lexer(data):
                 if i+1 == len(string):
                     continue
             
+            # Handle double symbols
+            if char == "<" and string[i+1] == "<":
+                temp += string[i+1]
+                i+=1
+            if char == ">" and string[i+1] == ">":
+                temp += string[i+1]
+                i+=1
+            if char == "*" and string[i+1] == "*":
+                temp += string[i+1]
+                i+=1
             
             
             if string[i+1] == " " or string[i+1] == "\t" or string[i+1] in symbols or temp in symbols:
@@ -105,6 +115,7 @@ def parseInt(value):
             base = 8
         elif value[1] == 'x':
             base = 16
+            last = str(int(last, base))
     else:
         last = value
     

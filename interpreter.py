@@ -7,10 +7,11 @@ class Interpreter:
     def eval_program(self, ast):
         latest = defineUndefined()
         for stmt in ast["body"]:
-            latest = self.eval_stmt(stmt, self.env)
+            if stmt:
+                latest = self.eval_stmt(stmt, self.env, False)
         return latest["value"]
     
-    def eval_stmt(self, stmt, env):
+    def eval_stmt(self, stmt, env, whale):
         if stmt["type"] == "NumericLiteral":
             return { "type": "number", "value": stmt["value"], "dtype": stmt["dtype"]}
         elif stmt["type"] == "StringLiteral":
@@ -18,7 +19,18 @@ class Interpreter:
         elif stmt["type"] == "Identifier":
             value = self.eval_identifier(stmt, env)
         elif stmt["type"] == "BinaryExpression":
-            value = self.eval_binary_expr(stmt,env)
+            value = self.eval_binary_expr(stmt,env, whale)
+        elif stmt["type"] == "AssignmentExpression":
+            name = stmt["left"]["value"]
+            value = self.eval_stmt(stmt["right"],env, whale)
+            env.assign(name, value)
+        elif stmt["type"] == "VariableDeclaration":
+            name = stmt["name"]
+            value = self.eval_stmt(stmt["value"],env, whale)
+            isConst = stmt["const"]
+            env.declare(name, value, isConst)
+        elif stmt["type"] == "WhalingExpression":
+            value = self.eval_stmt(stmt["value"],env, True)
         elif stmt["type"] == "Program":
             value = self.eval_program(stmt,env)
         else:
@@ -28,17 +40,20 @@ class Interpreter:
     def eval_identifier(self, stmt, env):
         return env.retrive(stmt["value"])
 
-    def eval_binary_expr(self, expr, env):
-        left = self.eval_stmt(expr["left"],env)
-        right = self.eval_stmt(expr["right"],env)
+    def eval_binary_expr(self, expr, env, whale):
+        left = self.eval_stmt(expr["left"],env, whale)
+        right = self.eval_stmt(expr["right"],env, whale)
         # check if both are numbers
         if left["type"] == "number" and right["type"] == "number":
-            return self.eval_binary_expr_int(expr["operator"], left, right)
+            return self.eval_binary_expr_int(expr["operator"], left, right, whale)
         elif left["type"] == "string" or right["type"] == "string":
             return self.eval_binary_expr_str(expr["operator"], left, right)
         return defineUndefined()
     
-    def eval_binary_expr_int(self, op, left_v, right_v):
+    def eval_binary_expr_int(self, op, left_v, right_v, whale):
+        # TODO: add support for other whaling 
+        # aka show the binary operations
+        if whale: print("Whaling support is not yet implemented")
         value = defineUndefined()
         left = left_v["value"]
         right = right_v["value"]
@@ -53,6 +68,18 @@ class Interpreter:
             value = left // right
         elif op == "%":
             value = left % right
+        elif op == "**":
+            value = left ** right
+        elif op == "<<":
+            value = left << right
+        elif op == ">>":
+            value = left >> right
+        elif op == "&":
+            value = left & right
+        elif op == "|":
+            value = left | right
+        elif op == "^":
+            value = left ^ right
         else:
             raise Exception(f"Unknown operator: {op}")
         return { "type": "number", "value": value, "dtype": dtype}

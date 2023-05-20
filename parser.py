@@ -66,10 +66,52 @@ class Parser:
         return dec
 
     def parse_whale(self):
-        return self.parse_expr()
+        self.consume()
+        return {
+            "type": "WhalingExpression",
+            "value": self.parse_stmt()
+            }
 
     def parse_expr(self):
-        return self.parse_additive_expr()
+        return self.parse_assignment_expr()
+    
+    def parse_assignment_expr(self):
+        left = self.parse_bitwise_expr()
+        if self.peek()["type"] == TokenType.Equals:
+            self.consume()
+            right = self.parse_bitwise_expr()
+            return {
+                "type": "AssignmentExpression",
+                "left": left,
+                "right": right
+            }
+        return left
+    
+    def parse_bitwise_expr(self):
+        left = self.parse_shift_expr()
+        while self.peek()["value"] == "&" or self.peek()["value"] == "|" or self.peek()["value"] == "^":
+            op = self.consume()
+            right = self.parse_shift_expr()
+            left = {
+                "type": "BinaryExpression",
+                "operator": op["value"],
+                "left": left,
+                "right": right
+            }
+        return left
+
+    def parse_shift_expr(self):
+        left = self.parse_additive_expr()
+        while self.peek()["value"] == "<<" or self.peek()["value"] == ">>":
+            op = self.consume()
+            right = self.parse_additive_expr()
+            left = {
+                "type": "BinaryExpression",
+                "operator": op["value"],
+                "left": left,
+                "right": right
+            }
+        return left
 
     def parse_additive_expr(self):
         left = self.parse_multiplicative_expr()
@@ -85,8 +127,21 @@ class Parser:
         return left
     
     def parse_multiplicative_expr(self):
-        left = self.parse_primary_expr()
+        left = self.parse_exponential_expr()
         while self.peek()["value"] == "*" or self.peek()["value"] == "/" or self.peek()["value"] == "%":
+            op = self.consume()
+            right = self.parse_exponential_expr()
+            left = {
+                "type": "BinaryExpression",
+                "operator": op["value"],
+                "left": left,
+                "right": right
+            }
+        return left
+    
+    def parse_exponential_expr(self):
+        left = self.parse_primary_expr()
+        while self.peek()["value"] == "**":
             op = self.consume()
             right = self.parse_primary_expr()
             left = {
@@ -96,7 +151,7 @@ class Parser:
                 "right": right
             }
         return left
-    
+
     def parse_primary_expr(self):
         curr = self.peek()["type"]
         if curr == TokenType.Number:
@@ -125,7 +180,9 @@ class Parser:
             return expr
         elif curr == TokenType.Newline:
             self.consume()
-            return self.parse_stmt()
+            return
+        elif curr == TokenType.EOF:
+            print("what?")
         else:
             raise Exception("Unexpected token " + self.peek()["value"])
         
