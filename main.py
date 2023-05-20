@@ -23,18 +23,25 @@ def main():
     else:
         parser = Parser()
         env = Environment()
-        env.declare("x", defineNum("int", 10), False)
-        env.declare("version", defineStr("0.1.alpha"), True)
+        # env.declare("x", defineNum("int", 10), False)
+        # env.declare("version", defineStr("0.2"), True)
         interpreter = Interpreter(env)
-        print("Spout REPL v0.1.alpha")
+        print("Spout REPL v0.2")
+        src = ""
         while True:
             data = input(">>> ") + "\n"
             if data == "exit\n":
                 break
-            ast = parser.createAST(data)
-            print(ast)
-            out = interpreter.eval_program(ast)
-            print(out)
+            elif data[-2:] == ";\n":
+                src += data[:-1]
+            else:
+                src += data
+                ast = parser.createAST(src)
+                out = interpreter.eval_program(ast)
+                src = ""
+                print(out)
+                
+        
 
            
 

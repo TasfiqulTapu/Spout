@@ -1,5 +1,6 @@
 from parser import Parser
 from environment import defineUndefined
+from whale import render
 
 class Interpreter:
     def __init__(self, env):
@@ -51,9 +52,6 @@ class Interpreter:
         return defineUndefined()
     
     def eval_binary_expr_int(self, op, left_v, right_v, whale):
-        # TODO: add support for other whaling 
-        # aka show the binary operations
-        if whale: print("Whaling support is not yet implemented")
         value = defineUndefined()
         left = left_v["value"]
         right = right_v["value"]
@@ -82,6 +80,9 @@ class Interpreter:
             value = left ^ right
         else:
             raise Exception(f"Unknown operator: {op}")
+        
+        if whale:
+            render(op, value, left, right)
         return { "type": "number", "value": value, "dtype": dtype}
     
     

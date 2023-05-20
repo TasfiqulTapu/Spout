@@ -19,11 +19,21 @@ class TokenType(Enum):
 KEYWORDS = {
     "let": TokenType.Let,
     "const": TokenType.Const,
-    "whale": TokenType.Whale
+    "whale": TokenType.Whale,
+}
+
+Logical = {
+    "and": "&",
+    "or": "|",
+    "xor": "^",
+    "lshift": ">>",
+    "rshift": "<<"
 }
 
 BinOps = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "**"]
 UnaOps = ["~"]
+
+
 
 def Lexer(data):
     lexical = []
@@ -155,6 +165,8 @@ def tokenize(lex):
                     tokens.append(token(lex.pop(0)[1:-1], TokenType.String))
                 elif lex[0][0] == "'":
                     tokens.append(token(lex.pop(0), TokenType.Char))
+                elif lex[0] in Logical:
+                    tokens.append(token(Logical[lex.pop(0)], TokenType.BinaryOperator))
                 else:
                     tokens.append(token(lex.pop(0), TokenType.Identifier))
             
