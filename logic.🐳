@@ -1,0 +1,4 @@
+let x = 3
+let y = 5
+let z = 10
+whale let r = x+y/z
