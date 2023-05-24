@@ -19,6 +19,8 @@ class Interpreter:
             return { "type": "string", "value": stmt["value"]}
         elif stmt["type"] == "Identifier":
             value = self.eval_identifier(stmt, env)
+        elif stmt["type"] == "CallExpression":
+            value = self.eval_call_expr(stmt, env, whale)
         elif stmt["type"] == "BinaryExpression":
             value = self.eval_binary_expr(stmt,env, whale)
         elif stmt["type"] == "AssignmentExpression":
@@ -40,6 +42,13 @@ class Interpreter:
     
     def eval_identifier(self, stmt, env):
         return env.retrive(stmt["value"])
+    
+    def eval_call_expr(self, stmt, env, whale):
+        args = list(map(lambda arg: self.eval_stmt(arg, env, whale), stmt["args"]))
+        fun = self.eval_stmt(stmt["callee"], env, whale)
+        if fun["type"] != "NativeFunction":
+            raise Exception(f"Cannot call non-function type: {fun['type']}")
+        return fun["call"](args, env) or defineUndefined()
 
     def eval_binary_expr(self, expr, env, whale):
         left = self.eval_stmt(expr["left"],env, whale)

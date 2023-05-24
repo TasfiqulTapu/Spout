@@ -11,6 +11,7 @@ class TokenType(Enum):
     BinaryOperator = auto()
     UnaryOperator = auto()
     Equals = auto()
+    Comma = auto()
     OpenParen = auto()
     CloseParen = auto()
     Newline = auto()
@@ -30,7 +31,7 @@ Logical = {
     "rshift": "<<"
 }
 
-BinOps = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "**"]
+BinOps = ["+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "**", ","]
 UnaOps = ["~"]
 
 
@@ -145,6 +146,8 @@ def tokenize(lex):
             tokens.append(token(lex.pop(0),TokenType.OpenParen))
         elif lex[0] == ")":
             tokens.append(token(lex.pop(0),TokenType.CloseParen))
+        elif lex[0] == ",":
+            tokens.append(token(lex.pop(0),TokenType.Comma))
         elif lex[0] in BinOps:
             tokens.append(token(lex.pop(0),TokenType.BinaryOperator))
         elif lex[0] == "=":

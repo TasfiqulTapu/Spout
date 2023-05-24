@@ -34,4 +34,7 @@ def defineStr(value):
     return { "type": "string", "value": value}
 def defineUndefined():
     return {"type": "undefined", "value": "undefined"}
+def defineNativeFunction(call):
+    return {"type": "NativeFunction", "call": call}
+
 

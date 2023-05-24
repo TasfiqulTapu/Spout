@@ -2,7 +2,7 @@ import sys
 import json
 from parser import Parser
 from interpreter import Interpreter
-from environment import Environment, defineNum, defineStr
+from environment import Environment, defineNum, defineStr, defineNativeFunction
 
 
 def main():
@@ -25,8 +25,9 @@ def main():
         env = Environment()
         # env.declare("x", defineNum("int", 10), False)
         # env.declare("version", defineStr("0.2"), True)
+        env.declare("print", defineNativeFunction(lambda args,scope: print("".join([item["value"] for item in args]))), False)
         interpreter = Interpreter(env)
-        print("Spout REPL v0.2")
+        print(f"\033[36mSpout\033[0m REPL v0.2")
         src = ""
         while True:
             data = input(">>> ") + "\n"
@@ -39,7 +40,9 @@ def main():
                 ast = parser.createAST(src)
                 out = interpreter.eval_program(ast)
                 src = ""
-                print(out)
+                # TODO: muted color for undefined
+                if out == "undefined": print(f"\033[244mundefined\033[0m ")
+                else: print(out)
                 
         
 

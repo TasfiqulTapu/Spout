@@ -140,10 +140,10 @@ class Parser:
         return left
     
     def parse_exponential_expr(self):
-        left = self.parse_primary_expr()
+        left = self.parse_call_member_expr()
         while self.peek()["value"] == "**":
             op = self.consume()
-            right = self.parse_primary_expr()
+            right = self.parse_call_member_expr()
             left = {
                 "type": "BinaryExpression",
                 "operator": op["value"],
@@ -151,6 +151,32 @@ class Parser:
                 "right": right
             }
         return left
+
+    def parse_call_member_expr(self):
+        caller = self.parse_primary_expr()
+        if self.peek()["type"] == TokenType.OpenParen:
+            return self.parse_call_expr(caller)
+        return caller
+
+    def parse_call_expr(self, callee):
+        call_expr = {
+            "type": "CallExpression",
+            "callee": callee,
+            "args": self.parse_args()
+        }
+        if self.peek()["type"] == TokenType.OpenParen:
+            call_expr = self.parse_call_expr(call_expr)
+        return call_expr
+
+    def parse_args(self):
+        self.expect(TokenType.OpenParen)
+        args = []
+        while self.peek()["type"] != TokenType.CloseParen:
+            args.append(self.parse_expr())
+            if self.peek()["type"] == TokenType.Comma:
+                self.consume()
+        self.expect(TokenType.CloseParen)
+        return args
 
     def parse_primary_expr(self):
         curr = self.peek()["type"]
