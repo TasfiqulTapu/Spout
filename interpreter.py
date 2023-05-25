@@ -1,15 +1,17 @@
 from parser import Parser
-from environment import defineUndefined
+from environment import defineUndefined, Environment
 from whale import render
 
 class Interpreter:
     def __init__(self, env):
         self.env = env
-    def eval_program(self, ast):
+    def eval_program(self, ast, env=None):
+        if env == None: env = self.env
         latest = defineUndefined()
         for stmt in ast["body"]:
             if stmt:
-                latest = self.eval_stmt(stmt, self.env, False)
+                latest = self.eval_stmt(stmt, env, False)
+        if latest == "undefined": return latest
         return latest["value"]
     
     def eval_stmt(self, stmt, env, whale):
@@ -32,6 +34,8 @@ class Interpreter:
             value = self.eval_stmt(stmt["value"],env, whale)
             isConst = stmt["const"]
             env.declare(name, value, isConst)
+        elif stmt["type"] == "FunctionDeclaration":
+            value = self.eval_function_declaration(stmt,env)
         elif stmt["type"] == "WhalingExpression":
             value = self.eval_stmt(stmt["value"],env, True)
         elif stmt["type"] == "Program":
@@ -43,12 +47,31 @@ class Interpreter:
     def eval_identifier(self, stmt, env):
         return env.retrive(stmt["value"])
     
+    def eval_function_declaration(self, stmt, env):
+        fn = {
+            "type": "function",
+            "name": stmt["name"],
+            "parameters": stmt["parameters"],
+            "body": stmt["body"],
+            "declarationEnv": env,
+            "value": "undefined"
+        }
+        return env.declare(stmt["name"], fn, True)
+
     def eval_call_expr(self, stmt, env, whale):
         args = list(map(lambda arg: self.eval_stmt(arg, env, whale), stmt["args"]))
         fun = self.eval_stmt(stmt["callee"], env, whale)
-        if fun["type"] != "NativeFunction":
-            raise Exception(f"Cannot call non-function type: {fun['type']}")
-        return fun["call"](args, env) or defineUndefined()
+        if fun["type"] == "NativeFunction":
+            return fun["call"](args, env) or defineUndefined()
+
+        elif fun["type"] == "function":
+            if len(args) != len(fun["parameters"]):
+                raise Exception(f"Expected {len(fun['parameters'])} arguments but got {len(args)}: in function {fun['name']}")
+            callEnv = Environment(fun["declarationEnv"])
+            for i in range(len(fun["parameters"])):
+                callEnv.declare(fun["parameters"][i], args[i], True)
+            return self.eval_program({"type": "program","body":fun["body"]}, callEnv) or defineUndefined()
+        raise Exception(f"Cannot call non-function type: {fun['type']}")
 
     def eval_binary_expr(self, expr, env, whale):
         left = self.eval_stmt(expr["left"],env, whale)

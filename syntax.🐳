@@ -25,6 +25,20 @@ let t = 1 % 2
 let u = 1 ** 2
 
 
+// function declaration
+fn hello: print("Hello, World!") // no args
+
+fn bello x: print("Hello, " + x) // one arg
+
+fn jello x,y,z : print(x + y + z) // multiple args
+
+fn mello (x,y,z): print(x + y + z) // multiple args with parentheses
+
+fn nello x,y,z: ( //multiple statements
+    print("Hello, " + x)
+    print("Hello, " + y)
+    print("Hello, " + z)
+)
 
 // outputting
 spout("%b", g) // 1001

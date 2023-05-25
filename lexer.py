@@ -13,6 +13,7 @@ class TokenType(Enum):
     UnaryOperator = auto()
     Equals = auto()
     Comma = auto()
+    Colon = auto()
     OpenParen = auto()
     CloseParen = auto()
     Newline = auto()
@@ -22,6 +23,7 @@ KEYWORDS = {
     "let": TokenType.Let,
     "const": TokenType.Const,
     "whale": TokenType.Whale,
+    "fn": TokenType.Fn
 }
 
 Logical = {
@@ -42,7 +44,7 @@ def Lexer(data):
     #automatic newline insertion
     string = data.replace(";", "\n")
     string = string  + "\n\n"
-    symbols = ["=", "+", "-", "*", "/", "%", "(", ")", "'", "&", "|", "^", "~", "!", "<", ">", "\n",","]
+    symbols = ["=", "+", "-", "*", "/", "%", "(", ")", "'", "&", "|", "^", "~", "!", "<", ">", "\n",",", ":", "<", ">"]
 
     lexed = []
     temp = ""
@@ -149,6 +151,8 @@ def tokenize(lex):
             tokens.append(token(lex.pop(0),TokenType.CloseParen))
         elif lex[0] == ",":
             tokens.append(token(lex.pop(0),TokenType.Comma))
+        elif lex[0] == ":":
+            tokens.append(token(lex.pop(0),TokenType.Colon))
         elif lex[0] in BinOps:
             tokens.append(token(lex.pop(0),TokenType.BinaryOperator))
         elif lex[0] == "=":

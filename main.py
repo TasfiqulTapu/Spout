@@ -19,13 +19,12 @@ def main():
             env = Environment()
             interpreter = Interpreter(env)
             out = interpreter.eval_program(ast)
-            print(out)
+            # print(out)
     else:
         parser = Parser()
         env = Environment()
         # env.declare("x", defineNum("int", 10), False)
         # env.declare("version", defineStr("0.2"), True)
-        env.declare("print", defineNativeFunction(lambda args,scope: print("".join([item["value"] for item in args]))), False)
         interpreter = Interpreter(env)
         print(f"\033[36mSpout\033[0m REPL v0.2")
         src = ""
@@ -40,7 +39,7 @@ def main():
                 ast = parser.createAST(src)
                 out = interpreter.eval_program(ast)
                 src = ""
-                if out == "undefined": print(f"\033[90mundefined\033[0m ")
+                if out == "undefined": print(f"\033[90mundefined\033[0m ") # 90m  is grey text
                 else: print(out)
                 
         

@@ -3,12 +3,15 @@ class Environment:
         self.parent = env
         self.vars = {}
         self.consts = {}
+        self.declare("print", defineNativeFunction(lambda args,scope: print("".join([item["value"] for item in args]))), False)
+
     
     def declare(self, name, value, constant):
         if name in self.vars:
             raise Exception(f"Variable {name} already declared")
         self.vars[name] = value
         if constant: self.consts[name] = constant
+        return value
     
     def assign(self, name, value):
         varEnv = self.resolve(name)

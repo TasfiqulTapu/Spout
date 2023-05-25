@@ -49,7 +49,8 @@ def render(operator: str, result: int, var1: int, var2: int ):
 
 
 def operation_builder(char, word):
-    visule_length= len(f"{word} {char} ")
-    op_str = f"\033[36m{word} {char}\033[0m "
-    return (op_str,visule_length)
+    # visual_length= len(f"{word} {char} ")
+    visual_length = 10
+    op_str = f"\033[36m{word} {char}\033[0m " + " " * (visual_length - len(f"{word} {char} "))
+    return (op_str,visual_length)
 

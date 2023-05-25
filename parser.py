@@ -37,6 +37,8 @@ class Parser:
         ttype = self.peek()["type"]
         if ttype == TokenType.Let or ttype == TokenType.Const:
             return self.parse_var_declaration()
+        elif ttype == TokenType.Fn:
+            return self.parse_fn_declaration()
         elif ttype == TokenType.Whale:
             return self.parse_whale()
         return self.parse_expr()
@@ -65,6 +67,49 @@ class Parser:
         self.expect(TokenType.Newline)
         return dec
 
+    def parse_fn_declaration(self):
+        self.consume()
+        name = self.expect(TokenType.Identifier)["value"]
+        arg = []
+        if self.peek()["type"] == TokenType.OpenParen:
+            self.consume()
+            while self.peek()["type"] != TokenType.CloseParen:
+                arg.append(self.parse_expr())
+                if self.peek()["type"] == TokenType.Comma:
+                    self.consume()
+            self.expect(TokenType.CloseParen)
+        else:
+            while self.peek()["type"] != TokenType.Colon:
+                arg.append(self.parse_expr())
+                if self.peek()["type"] == TokenType.Comma:
+                    self.consume()
+        self.expect(TokenType.Colon)
+        # Check if everything is an Identifier
+        params = []
+        for i in arg:
+            if i["type"] != "Identifier":
+                raise Exception("Function parameters must be identifiers")
+            params.append(i["value"])
+
+        body = []
+        if self.peek()["type"] == TokenType.OpenParen:
+            self.consume()
+            while(self.peek()["type"] != TokenType.EOF and self.peek()["type"] != TokenType.CloseParen):
+                body.append(self.parse_stmt())
+            self.expect(TokenType.CloseParen)
+        else: 
+            while(self.peek()["type"] != TokenType.EOF and self.peek()["type"] != TokenType.Newline):
+                body.append(self.parse_stmt())
+            
+        return {
+            "type": "FunctionDeclaration",
+            "name": name,
+            "parameters": params,
+            "body": body
+        }
+        
+
+
     def parse_whale(self):
         self.consume()
         return {
@@ -86,7 +131,7 @@ class Parser:
                 "right": right
             }
         return left
-    
+
     def parse_bitwise_expr(self):
         left = self.parse_shift_expr()
         while self.peek()["value"] == "&" or self.peek()["value"] == "|" or self.peek()["value"] == "^":
