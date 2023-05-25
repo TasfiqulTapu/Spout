@@ -7,6 +7,7 @@ class TokenType(Enum):
     String = auto()
     Let = auto()
     Const = auto()
+    Fn = auto()
     Whale = auto()
     BinaryOperator = auto()
     UnaryOperator = auto()

@@ -40,8 +40,7 @@ def main():
                 ast = parser.createAST(src)
                 out = interpreter.eval_program(ast)
                 src = ""
-                # TODO: muted color for undefined
-                if out == "undefined": print(f"\033[244mundefined\033[0m ")
+                if out == "undefined": print(f"\033[90mundefined\033[0m ")
                 else: print(out)
                 
         
