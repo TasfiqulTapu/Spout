@@ -1,5 +1,5 @@
-from lexer import TokenType, Lexer, parseInt
-from environment import defineUndefined
+from .lexer import TokenType, Lexer, parseInt
+from .environment import defineUndefined
 
 class Parser:
     # have a private token list

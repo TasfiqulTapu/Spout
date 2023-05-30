@@ -1,8 +1,8 @@
 import sys
 import json
-from parser import Parser
-from interpreter import Interpreter
-from environment import Environment, defineNum, defineStr, defineNativeFunction
+from spout.parser import Parser
+from spout.interpreter import Interpreter
+from spout.environment import Environment, defineNum, defineStr, defineNativeFunction
 
 
 def main():

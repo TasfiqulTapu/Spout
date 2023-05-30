@@ -1,6 +1,6 @@
-from parser import Parser
-from environment import defineUndefined, Environment
-from whale import render
+from .parser import Parser
+from .environment import defineUndefined, Environment
+from .whale import render
 
 class Interpreter:
     def __init__(self, env):
