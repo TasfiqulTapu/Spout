@@ -3,7 +3,7 @@ from .environment import defineUndefined, Environment
 from .whale import render
 
 class Interpreter:
-    def __init__(self, env):
+    def __init__(self, env = Environment()):
         self.env = env
     def eval_program(self, ast, env=None):
         if env == None: env = self.env

@@ -16,16 +16,14 @@ def main():
         if len(sys.argv) >= 3 and sys.argv[2] == "--ast":
             print(json.dumps(ast, indent=2))
         else:
-            env = Environment()
-            interpreter = Interpreter(env)
+            interpreter = Interpreter()
             out = interpreter.eval_program(ast)
             # print(out)
     else:
         parser = Parser()
-        env = Environment()
         # env.declare("x", defineNum("int", 10), False)
         # env.declare("version", defineStr("0.2"), True)
-        interpreter = Interpreter(env)
+        interpreter = Interpreter()
         print(f"\033[36mSpout\033[0m REPL v0.2")
         src = ""
         while True:

@@ -1,10 +1,17 @@
+
 class Environment:
     def __init__(self, env=None):
         self.parent = env
         self.vars = {}
         self.consts = {}
         self.declare("print", defineNativeFunction(lambda args,scope: print("".join([str(item["value"]) for item in args]))), False)
+        if self.parent == None:
+            self.define_consts()
 
+    def define_consts(self):
+        self.declare("true", defineNum("int", 1), False)
+        self.declare("false", defineNum("int", 0), False)
+        self.declare("undefined", defineUndefined(), True)
     
     def declare(self, name, value, constant):
         if name in self.vars:
