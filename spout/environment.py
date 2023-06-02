@@ -3,7 +3,7 @@ class Environment:
         self.parent = env
         self.vars = {}
         self.consts = {}
-        self.declare("print", defineNativeFunction(lambda args,scope: print("".join([item["value"] for item in args]))), False)
+        self.declare("print", defineNativeFunction(lambda args,scope: print("".join([str(item["value"]) for item in args]))), False)
 
     
     def declare(self, name, value, constant):

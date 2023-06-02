@@ -40,7 +40,9 @@ def main():
                 out = interpreter.eval_program(ast)
                 src = ""
                 if out == "undefined": print(f"\033[90mundefined\033[0m ") # 90m  is grey text
-                else: print(out)
+                else: 
+                    if not isinstance(out, dict): print(out)
+                    else: print(out["value"]) 
                 
         
 

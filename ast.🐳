@@ -1,2 +1,10 @@
-fn hello x: print("Hello, " + x)
-hello("world")
+fn main(
+    a,
+    b,
+    c,
+    d
+    ):
+(a + b + c + d)
+
+let x = main(5,10,3, 2)
+print(x)

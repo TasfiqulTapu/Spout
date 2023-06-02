@@ -11,8 +11,10 @@ class Interpreter:
         for stmt in ast["body"]:
             if stmt:
                 latest = self.eval_stmt(stmt, env, False)
-        if latest == "undefined": return latest
-        return latest["value"]
+        # print(latest, not isinstance(latest, dict))
+        # if not isinstance(latest, dict): return latest
+        # return latest["value"]
+        return latest
     
     def eval_stmt(self, stmt, env, whale):
         if stmt["type"] == "NumericLiteral":

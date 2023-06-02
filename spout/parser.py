@@ -13,6 +13,10 @@ class Parser:
         popped = self.tokens.pop(0)
         return popped
     
+    def terminate_newline(self):
+        while self.peek()["type"]==TokenType.Newline:
+            self.consume()
+
     def peek(self):
         return self.tokens[0]
 
@@ -73,10 +77,12 @@ class Parser:
         arg = []
         if self.peek()["type"] == TokenType.OpenParen:
             self.consume()
+            self.terminate_newline()
             while self.peek()["type"] != TokenType.CloseParen:
                 arg.append(self.parse_expr())
                 if self.peek()["type"] == TokenType.Comma:
                     self.consume()
+                self.terminate_newline()
             self.expect(TokenType.CloseParen)
         else:
             while self.peek()["type"] != TokenType.Colon:
@@ -92,6 +98,7 @@ class Parser:
             params.append(i["value"])
 
         body = []
+        self.terminate_newline()
         if self.peek()["type"] == TokenType.OpenParen:
             self.consume()
             while(self.peek()["type"] != TokenType.EOF and self.peek()["type"] != TokenType.CloseParen):
