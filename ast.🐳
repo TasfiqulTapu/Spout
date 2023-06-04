@@ -4,7 +4,7 @@ fn main(
     c,
     d
     ):
-(a + b + c + d)
+(spout a + b + c + d)
 
 let x = main(5,10,3, 2)
 print(x)

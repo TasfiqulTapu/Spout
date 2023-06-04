@@ -3,7 +3,7 @@ import json
 from spout.parser import Parser
 from spout.interpreter import Interpreter
 from spout.environment import Environment, defineNum, defineStr, defineNativeFunction
-
+from spout.spout import Runtime
 
 def main():
     if len(sys.argv) >= 2:
@@ -11,18 +11,14 @@ def main():
         data = ""
         with open(filename, 'r') as f:
             data = f.read()
-        parser = Parser()
-        ast = parser.createAST(data)
         if len(sys.argv) >= 3 and sys.argv[2] == "--ast":
+            ast = Runtime().AST(data)
             print(json.dumps(ast, indent=2))
         else:
-            interpreter = Interpreter()
-            out = interpreter.eval_program(ast)
-            # print(out)
+            Runtime().run(data)
+            
     else:
         parser = Parser()
-        # env.declare("x", defineNum("int", 10), False)
-        # env.declare("version", defineStr("0.2"), True)
         interpreter = Interpreter()
         print(f"\033[36mSpout\033[0m REPL v0.2")
         src = ""

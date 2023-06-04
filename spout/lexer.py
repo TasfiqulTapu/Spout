@@ -23,6 +23,7 @@ KEYWORDS = {
     "let": TokenType.Let,
     "const": TokenType.Const,
     "whale": TokenType.Whale,
+    "spout": TokenType.Whale,
     "fn": TokenType.Fn
 }
 
