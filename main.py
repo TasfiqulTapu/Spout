@@ -2,7 +2,6 @@ import sys
 import json
 from spout.parser import Parser
 from spout.interpreter import Interpreter
-from spout.environment import Environment, defineNum, defineStr, defineNativeFunction
 from spout.spout import Runtime
 
 def main():

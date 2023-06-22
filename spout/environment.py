@@ -12,6 +12,7 @@ class Environment:
         self.declare("true", defineNum("int", 1), False)
         self.declare("false", defineNum("int", 0), False)
         self.declare("undefined", defineUndefined(), True)
+        self.declare("__neg__", defineNum("int", -1), True )
     
     def declare(self, name, value, constant):
         if name in self.vars:
