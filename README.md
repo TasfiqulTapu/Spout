@@ -21,7 +21,7 @@ fn add a,b: spout a + b
 
 // function calling
 add(a,b)
-print(a+b)
+print("Hello World!")
 ```
 Run the progragm using,
 ```bash
@@ -29,7 +29,7 @@ spout example.🐳
 ```
 or with source,
 ```bash
-python project.py example.🐳
+python main.py example.🐳
 ```
 
 #### Language features
@@ -86,6 +86,7 @@ Currently all numbers are int and there is no proper way to get negative numbers
 0o400
 0xFF
 ``` 
+
 
 ##### Strings
 Use `""`to express a staring. Strings can be joined added and **subtracted** from each other. Take that, every other language out there. They can also be multiplied by ints.
